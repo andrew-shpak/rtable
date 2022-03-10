@@ -1,4 +1,4 @@
-process.env.RUNNING_PRETTIER = 'true'
+process.env.RUNNING_PRETTIER = 'true';
 module.exports = {
   arrowParens: 'avoid',
   bracketSpacing: false,
@@ -17,4 +17,4 @@ module.exports = {
   trailingComma: 'all',
   useTabs: false,
   plugins: [require('prettier-plugin-tailwindcss')],
-}
+};
