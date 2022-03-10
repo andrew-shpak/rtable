@@ -21,8 +21,8 @@ const App = () => {
                         body: "body",
                     }}
                     actions={{
-                        width:"9vw",
-                        className:"actions",
+                        width: "9vw",
+                        className: "actions",
                         copy: {
                             onClick: (row) => {
                             },
@@ -34,7 +34,7 @@ const App = () => {
                         lastName: '1',
                         middleName: '3',
                         id: '1',
-                    },{
+                    }, {
                         name: '1',
                         lastName: '1',
                         middleName: '3',

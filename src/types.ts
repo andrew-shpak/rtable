@@ -47,11 +47,13 @@ export type RTableProps<> = {
     pagination?: {
         count?: number
         page?: number
-        rowsPerPage: number[]
+        defaultRowsPerPage?: number
+        rowsPerPage?: number[]
         previousPage?: React.ReactNode
         nextPage?: React.ReactNode
         previousPageClassName?: string
-        nextPageClassName?: string
+        nextPageClassName?: string,
+        of?:string
     },
     toolbar?: {
         className?: string,

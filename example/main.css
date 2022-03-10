@@ -4,14 +4,16 @@
 
 .table {
     border: 1px solid black;
-    padding:10px;
+    padding: 10px;
 }
 
-.header{
+.header {
 }
-.body{
+
+.body {
     height: 65vh;
 }
-.actions{
+
+.actions {
     padding: 10px;
 }
