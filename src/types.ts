@@ -11,10 +11,11 @@ export type RTableColumnProps = {
   className?: string;
   hint?: string;
   type?: 'text' | 'number' | 'date';
+  sorted?: boolean;
 };
 
 export type RTableProps<> = {
-  rows: NonNullable<ReadonlyArray<RTableModel>>;
+  rows: NonNullable<Array<RTableModel>>;
   columns: NonNullable<ReadonlyArray<RTableColumnProps>>;
   getRowId?: (row: RTableModel) => string | number;
   classNames?: {
@@ -49,3 +50,5 @@ export type RTableProps<> = {
     checkbox?: string;
   };
 };
+
+export type Order = 'asc' | 'desc';

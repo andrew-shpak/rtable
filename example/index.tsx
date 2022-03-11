@@ -65,6 +65,19 @@ const Actions = (props: { checked: string[] }) => {
                         },
 * */
 const App = () => {
+  const range = [...Array.from(Array(100).keys())];
+  const data = React.useMemo(
+    () =>
+      range.map((i) => {
+        return {
+          name: i,
+          lastName: i,
+          middleName: i,
+          id: i,
+        };
+      }),
+    []
+  );
   return (
     <div
       style={{
@@ -97,20 +110,7 @@ const App = () => {
             },
             actions: (params) => <Actions checked={params.ids} />,
           }}
-          rows={[
-            {
-              name: '1',
-              lastName: '1',
-              middleName: '3',
-              id: '1',
-            },
-            {
-              name: '1',
-              lastName: '1',
-              middleName: '3',
-              id: '2',
-            },
-          ]}
+          rows={data}
           columns={[
             {
               key: 'name',
