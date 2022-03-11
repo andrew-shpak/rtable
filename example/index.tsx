@@ -4,6 +4,66 @@ import * as ReactDOM from 'react-dom';
 import RTable from '../src';
 import './main.css';
 
+const Actions = (props: { checked: string[] }) => {
+  const { checked } = props;
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}
+    >
+      <button className={'btn btn-success'} onClick={() => {}}>
+        Додати
+      </button>
+      <button className={'btn btn-danger'} disabled={checked.length === 0}>
+        Видалити
+      </button>
+      {/*{toolbar?.columns && (
+                <button
+                    className={toolbar.columns.className}
+                    onClick={() => {
+                        setVisibleColumns([]);
+                    }}
+                >
+                    Колонки
+                </button>
+            )}
+            {toolbar?.filters && (
+                <button
+                    style={{
+                        marginRight: '1rem',
+                    }}
+                    className={toolbar.filters.className}
+                >
+                    Фільтри
+                </button>
+            )}*/}
+    </div>
+  );
+};
+/*
+*  add: {
+                            className: "btn btn-success",
+                            title:"Додати",
+                            onClick: () => {
+
+                            }
+                        },
+                        remove: {
+                            title:"Видалити",
+                            className: "btn btn-danger",
+                            onClick: (ids) => {
+
+                            }
+                        },
+                        columns: {
+                            className: "btn btn-info",
+                        },
+                        filters: {
+                            className: "btn btn-primary",
+                        },
+* */
 const App = () => {
   return (
     <div
@@ -23,14 +83,19 @@ const App = () => {
             column: 'column',
             header: 'header',
             body: 'body',
+            row: 'row',
           }}
-          actions={{
-            width: '9vw',
-            className: 'actions',
-            copy: {
-              onClick: (row) => {},
-              content: '7',
+          selection={{
+            checkbox: 'checkbox',
+          }}
+          toolbar={{
+            visible: true,
+            className: 'toolbar',
+            search: {
+              placeholder: 'Введіть текст',
+              className: 'search',
             },
+            actions: (params) => <Actions checked={params.ids} />,
           }}
           rows={[
             {

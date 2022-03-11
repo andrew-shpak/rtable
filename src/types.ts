@@ -10,6 +10,7 @@ export type RTableColumnProps = {
   flex?: number;
   className?: string;
   hint?: string;
+  type?: 'text' | 'number' | 'date';
 };
 
 export type RTableProps<> = {
@@ -21,28 +22,7 @@ export type RTableProps<> = {
     column?: string;
     header?: string;
     body?: string;
-  };
-  actions?: {
-    width?: string;
-    flex?: number;
-    className?: string;
-    copy?: {
-      content: React.ReactNode;
-      onClick: (row: RTableModel) => void;
-    };
-    remove?: {
-      content: React.ReactNode;
-      onClick: (row: RTableModel) => void;
-    };
-    edit?: {
-      content: React.ReactNode;
-      onClick: (row: RTableModel) => void;
-    };
-    add?: {
-      content: React.ReactNode;
-      onClick: () => void;
-    };
-    customActions?: React.ReactNode;
+    row?: string;
   };
   pagination?: {
     count?: number;
@@ -57,26 +37,15 @@ export type RTableProps<> = {
   };
   toolbar?: {
     className?: string;
-    filtersButtonClassName?: string;
-    columnsButtonClassName?: string;
-    showFiltersButton?: boolean;
-    showColumnsButton?: boolean;
-    add?: {
-      content: React.ReactNode;
-      className?: string;
-      onClick: () => void;
-    };
-    remove?: {
-      content: React.ReactNode;
-      className?: string;
-      onClick: () => void;
-    };
+    visible?: boolean;
+    actions?: (params: { ids: string[] }) => React.ReactNode;
     search?: {
       placeholder?: string;
+      className?: string;
     };
   };
   selection?: {
     visible?: boolean;
-    className?: string;
+    checkbox?: string;
   };
 };

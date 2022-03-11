@@ -1,19 +1,54 @@
-.column {
-  padding: 10px;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 .table {
-  border: 1px solid black;
-  padding: 10px;
+  @apply shadow-xl p-2.5 rounded-md bg-white;
 }
 
-.header {
+.column {
+  @apply p-2.5 border-t border-l;
 }
 
-.body {
-  height: 65vh;
+.row:last-child {
+  @apply border-b;
 }
 
-.actions {
-  padding: 10px;
+body {
+  @apply bg-slate-200;
+}
+
+.checkbox {
+  @apply rounded bg-white h-4 w-4;
+}
+
+.toolbar {
+  @apply mb-2;
+}
+
+.toolbar--button {
+}
+
+.btn {
+  @apply cursor-pointer rounded-lg px-4 py-1 shadow-2xl mr-1 disabled:opacity-40;
+}
+
+.btn-success {
+  @apply bg-emerald-400;
+}
+
+.btn-danger {
+  @apply bg-rose-400;
+}
+
+.btn-info {
+  @apply bg-sky-500;
+}
+
+.btn-primary {
+  @apply bg-blue-400;
+}
+
+.search {
+  @apply rounded shadow-md text-sm h-8 w-full;
 }
