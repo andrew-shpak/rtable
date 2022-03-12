@@ -113,19 +113,21 @@ export default function RTable(props: RTableProps) {
             if (!visibleColumns.includes(column.key)) return null;
             const type = column.type ?? 'text';
             const flex = `${column.flex ?? 0} 0 ${column.width ?? 'auto'}`;
+            const sortItem = orderBy.find((f) => f.column === column.key);
             return (
               <div
                 style={{
                   flex,
+                  display: 'flex',
                   textAlign: type === 'number' ? 'right' : 'left',
                   cursor: 'pointer',
+                  alignItems: 'center',
                 }}
                 key={`${column.key}_${columnIndex}`}
                 className={`${column?.className ?? ''} ${
                   classNames?.column ?? ''
                 }`}
                 onClick={() => {
-                  const sortItem = orderBy.find((f) => f.column === column.key);
                   if (sortItem) {
                     const newArray = orderBy.filter(
                       (f) => f.column !== column.key
@@ -146,7 +148,67 @@ export default function RTable(props: RTableProps) {
                   }
                 }}
               >
-                {column.title}
+                {column.title}{' '}
+                {sortItem?.direction === 'asc' && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="#18181b"
+                    viewBox="0 0 256 256"
+                  >
+                    <rect width="16" height="16" fill="none"></rect>
+                    <line
+                      x1="128"
+                      y1="216"
+                      x2="128"
+                      y2="40"
+                      fill="none"
+                      stroke="#18181b"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="24"
+                    ></line>
+                    <polyline
+                      points="56 112 128 40 200 112"
+                      fill="none"
+                      stroke="#18181b"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="24"
+                    />
+                  </svg>
+                )}
+                {sortItem?.direction === 'desc' && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="#18181b"
+                    viewBox="0 0 256 256"
+                  >
+                    <rect width="16" height="16" fill="none" />
+                    <line
+                      x1="128"
+                      y1="40"
+                      x2="128"
+                      y2="216"
+                      fill="none"
+                      stroke="#18181b"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="24"
+                    />
+                    <polyline
+                      points="56 144 128 216 200 144"
+                      fill="none"
+                      stroke="#18181b"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="24"
+                    />
+                  </svg>
+                )}
               </div>
             );
           })}
@@ -165,8 +227,8 @@ export default function RTable(props: RTableProps) {
       >
         {rows
           .slice(page * take, page * take + take)
-          .map((row: any, rowIndex) => {
-            const key = allIds[rowIndex];
+          .map((row: any) => {
+            const key = getRowId(row);
             const rowChecked = checked.includes(key);
             return (
               <div
@@ -269,14 +331,14 @@ export default function RTable(props: RTableProps) {
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
-                fill="#fcfcfc"
+                fill="#171717"
                 viewBox="0 0 256 256"
               >
                 <rect width="256" height="256" fill="none"></rect>
                 <polyline
                   points="160 208 80 128 160 48"
                   fill="none"
-                  stroke="#fcfcfc"
+                  stroke="#171717"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="24"
@@ -290,22 +352,22 @@ export default function RTable(props: RTableProps) {
             pagination.nextPage
           ) : (
             <button
-              disabled={page === 0}
               className={pagination?.nextPageClassName ?? ''}
+              disabled={take * page + take >= rows.length}
               onClick={() => setPage((state) => state + 1)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
-                fill="#fcfcfc"
+                fill="#171717"
                 viewBox="0 0 256 256"
               >
                 <rect width="256" height="256" fill="none"></rect>
                 <polyline
                   points="96 48 176 128 96 208"
                   fill="none"
-                  stroke="#fcfcfc"
+                  stroke="#171717"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="24"

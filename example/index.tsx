@@ -101,6 +101,10 @@ const App = () => {
           selection={{
             checkbox: 'checkbox',
           }}
+          pagination={{
+            previousPageClassName: 'btn-icon',
+            nextPageClassName: 'btn-icon',
+          }}
           toolbar={{
             visible: true,
             className: 'toolbar',
