@@ -52,7 +52,7 @@ export type RTableProps = {
   };
   extend?: {
     className: string;
-    render: (params: { row: RTableModel; index: number }) => React.ReactNode;
+    render: (params: { row: RTableModel; rowIndex: number }) => React.ReactNode;
   };
 };
 
