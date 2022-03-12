@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {Order, RTableModel, RTableProps} from './types';
-import memoize from 'micro-memoize';
 
 export default function RTable(props: RTableProps) {
     const {
@@ -40,7 +39,7 @@ export default function RTable(props: RTableProps) {
     React.useEffect(()=>{
         if (onSearchInputChanged) onSearchInputChanged(globalSearchValue)
     },[globalSearchValue])
-    const showRowFn = memoize((row: RTableModel, searchValue: string) => Object.values(row).some((f) => f.toString().includes(searchValue)));
+    const showRowFn = React.useCallback((row: RTableModel, searchValue: string) => Object.values(row).some((f) => f.toString().includes(searchValue)),[]);
     const filteredRows = React.useMemo(() => {
         if(globalSearchValue.length === 0) return props.rows;
         return props.rows.filter((row) => showRowFn(row, globalSearchValue))

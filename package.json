@@ -72,8 +72,5 @@
       "pretty-quick — staged",
       "git add"
     ]
-  },
-  "dependencies": {
-    "micro-memoize": "^4.0.9"
   }
 }
