@@ -4,6 +4,7 @@ import { Order, RTableProps } from './types';
 export default function RTable(props: RTableProps) {
   const {
     columns,
+    height,
     getRowId = (row: { [key: string]: any }) => row.id,
     classNames,
     pagination = {},
@@ -11,6 +12,7 @@ export default function RTable(props: RTableProps) {
     selection = {
       visible: true,
     },
+    extend,
   } = props;
   const {
     rowsPerPage = [5, 10, 20, 50, 100],
@@ -32,7 +34,10 @@ export default function RTable(props: RTableProps) {
     () => props.rows.map((row: any) => getRowId(row)),
     [props.rows, getRowId]
   );
+  // Extended
+  const [extended, setExtended] = React.useState<string[]>([]);
   // Sorting
+  const [hoveredColumn, setHoveredColumn] = React.useState<string>('');
   const [orderBy, setOrderBy] = React.useState<
     { column: string; direction: Order; type: 'text' | 'number' | 'date' }[]
   >([]);
@@ -85,6 +90,79 @@ export default function RTable(props: RTableProps) {
             alignItems: 'center',
           }}
         >
+          {extend && (
+            <div
+              style={{
+                flex: `0 0  auto`,
+              }}
+              className={extend?.className ?? ''}
+              onClick={() => {
+                if (extended.length === 0) setExtended(allIds);
+                else setExtended([]);
+              }}
+            >
+              {extended.length === 0 && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="15"
+                  height="16"
+                  fill={'#18181b'}
+                  viewBox="0 0 256 256"
+                >
+                  <rect width="256" height="256" fill="none" />
+                  <line
+                    x1="40"
+                    y1="128"
+                    x2="216"
+                    y2="128"
+                    fill="none"
+                    stroke={'#18181b'}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="24"
+                  />
+                  <polyline
+                    points="144 56 216 128 144 200"
+                    fill="none"
+                    stroke={'#18181b'}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="24"
+                  />
+                </svg>
+              )}
+              {extended.length > 0 && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill={'#18181b'}
+                  viewBox="0 0 256 256"
+                >
+                  <rect width="16" height="16" fill="none" />
+                  <line
+                    x1="128"
+                    y1="40"
+                    x2="128"
+                    y2="216"
+                    fill="none"
+                    stroke={'#18181b'}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="24"
+                  />
+                  <polyline
+                    points="56 144 128 216 200 144"
+                    fill="none"
+                    stroke={'#18181b'}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="24"
+                  />
+                </svg>
+              )}
+            </div>
+          )}
           {(selection?.visible || selection.checkbox) && (
             <div
               style={{
@@ -114,6 +192,8 @@ export default function RTable(props: RTableProps) {
             const type = column.type ?? 'text';
             const flex = `${column.flex ?? 0} 0 ${column.width ?? 'auto'}`;
             const sortItem = orderBy.find((f) => f.column === column.key);
+            const isHovered =
+              hoveredColumn === column.key && !sortItem?.direction;
             return (
               <div
                 style={{
@@ -123,6 +203,8 @@ export default function RTable(props: RTableProps) {
                   cursor: 'pointer',
                   alignItems: 'center',
                 }}
+                onMouseEnter={() => setHoveredColumn(column.key)}
+                onMouseLeave={() => setHoveredColumn('')}
                 key={`${column.key}_${columnIndex}`}
                 className={`${column?.className ?? ''} ${
                   classNames?.column ?? ''
@@ -149,30 +231,30 @@ export default function RTable(props: RTableProps) {
                 }}
               >
                 {column.title}{' '}
-                {sortItem?.direction === 'asc' && (
+                {(sortItem?.direction === 'asc' || isHovered) && (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
                     height="16"
-                    fill="#18181b"
+                    fill={isHovered ? '#d1d5db' : '#18181b'}
                     viewBox="0 0 256 256"
                   >
-                    <rect width="16" height="16" fill="none"></rect>
+                    <rect width="16" height="16" fill="none" />
                     <line
                       x1="128"
                       y1="216"
                       x2="128"
                       y2="40"
                       fill="none"
-                      stroke="#18181b"
+                      stroke={isHovered ? '#d1d5db' : '#18181b'}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="24"
-                    ></line>
+                    />
                     <polyline
                       points="56 112 128 40 200 112"
                       fill="none"
-                      stroke="#18181b"
+                      stroke={isHovered ? '#d1d5db' : '#18181b'}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="24"
@@ -184,7 +266,7 @@ export default function RTable(props: RTableProps) {
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
                     height="16"
-                    fill="#18181b"
+                    fill={isHovered ? '#d1d5db' : '#18181b'}
                     viewBox="0 0 256 256"
                   >
                     <rect width="16" height="16" fill="none" />
@@ -194,7 +276,7 @@ export default function RTable(props: RTableProps) {
                       x2="128"
                       y2="216"
                       fill="none"
-                      stroke="#18181b"
+                      stroke={isHovered ? '#d1d5db' : '#18181b'}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="24"
@@ -202,7 +284,7 @@ export default function RTable(props: RTableProps) {
                     <polyline
                       points="56 144 128 216 200 144"
                       fill="none"
-                      stroke="#18181b"
+                      stroke={isHovered ? '#d1d5db' : '#18181b'}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="24"
@@ -218,6 +300,7 @@ export default function RTable(props: RTableProps) {
         className={classNames?.body ?? ''}
         style={{
           overflowY: 'auto',
+          height,
         }}
         ref={bodyScroll}
         onScroll={(scroll: React.UIEvent<HTMLDivElement>) => {
@@ -225,24 +308,103 @@ export default function RTable(props: RTableProps) {
             headerScroll.current.scrollLeft = scroll.currentTarget.scrollLeft;
         }}
       >
-        {rows
-          .slice(page * take, page * take + take)
-          .map((row: any) => {
-            const key = getRowId(row);
-            const rowChecked = checked.includes(key);
-            return (
+        {rows.slice(page * take, page * take + take).map((row, rowIndex) => {
+          const key = getRowId(row);
+          const rowChecked = checked.includes(key);
+          const renderExtendedRow =
+            extend &&
+            extend.render({
+              row,
+              index: rowIndex,
+            });
+          const isExtended = extended.includes(key);
+          return (
+            <React.Fragment key={key}>
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                 }}
                 className={classNames?.row ?? ''}
-                key={key}
               >
+                {extend && (
+                  <div
+                    style={{
+                      flex: `0 0  auto`,
+                    }}
+                    className={extend?.className ?? ''}
+                    onClick={() => {
+                      if (extended.includes(key))
+                        setExtended(extended.filter((f) => f !== key));
+                      else setExtended([...extended, key]);
+                    }}
+                  >
+                    {!isExtended && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="15"
+                        height="16"
+                        fill={'#18181b'}
+                        viewBox="0 0 256 256"
+                      >
+                        <rect width="256" height="256" fill="none" />
+                        <line
+                          x1="40"
+                          y1="128"
+                          x2="216"
+                          y2="128"
+                          fill="none"
+                          stroke={'#18181b'}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                        <polyline
+                          points="144 56 216 128 144 200"
+                          fill="none"
+                          stroke={'#18181b'}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                      </svg>
+                    )}
+                    {isExtended && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill={'#18181b'}
+                        viewBox="0 0 256 256"
+                      >
+                        <rect width="16" height="16" fill="none" />
+                        <line
+                          x1="128"
+                          y1="40"
+                          x2="128"
+                          y2="216"
+                          fill="none"
+                          stroke={'#18181b'}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                        <polyline
+                          points="56 144 128 216 200 144"
+                          fill="none"
+                          stroke={'#18181b'}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                )}
                 {(selection?.visible || selection?.checkbox) && (
                   <div
                     style={{
-                      flex: `0 0 auto`,
+                      flex: `0 0  auto`,
                     }}
                     className={classNames?.column ?? ''}
                   >
@@ -282,8 +444,21 @@ export default function RTable(props: RTableProps) {
                   );
                 })}
               </div>
-            );
-          })}
+              {isExtended && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: bodyScroll.current?.scrollWidth ?? '100%',
+                  }}
+                  className={extend?.className ?? ''}
+                >
+                  {renderExtendedRow}
+                </div>
+              )}
+            </React.Fragment>
+          );
+        })}
       </div>
       <div
         style={{
@@ -296,6 +471,7 @@ export default function RTable(props: RTableProps) {
         <select
           defaultValue={take}
           onChange={(event) => {
+            setPage(0);
             setTake(parseInt(event.target.value, 10));
           }}
         >
@@ -305,14 +481,8 @@ export default function RTable(props: RTableProps) {
             </option>
           ))}
         </select>
-        <input
-          placeholder={'Enter page number'}
-          style={{
-            width: '10%',
-          }}
-        />
         <span>
-          {take * page + 1}-
+          {take * page + 1} -{' '}
           {rows.length < take ? rows.length : take * page + take} {of}{' '}
           {rows.length}
         </span>

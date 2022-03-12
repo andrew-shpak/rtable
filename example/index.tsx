@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import RTable from '../src';
 import './main.css';
+import { render } from 'react-dom';
 
 const Actions = (props: { checked: string[] }) => {
   const { checked } = props;
@@ -104,6 +105,7 @@ const App = () => {
           pagination={{
             previousPageClassName: 'btn-icon',
             nextPageClassName: 'btn-icon',
+            of: 'з',
           }}
           toolbar={{
             visible: true,
@@ -115,6 +117,7 @@ const App = () => {
             actions: (params) => <Actions checked={params.ids} />,
           }}
           rows={data}
+          height={'70vh'}
           columns={[
             {
               key: 'name',
@@ -132,6 +135,12 @@ const App = () => {
               width: '1000px',
             },
           ]}
+          extend={{
+            className: 'extended',
+            render: () => {
+              return '1';
+            },
+          }}
         />
       </div>
     </div>

@@ -10,8 +10,16 @@
   @apply p-2.5 border-t border-l;
 }
 
+.column:last-child {
+  @apply border-r;
+}
+
 .row:last-child {
   @apply border-b;
+}
+
+.extended {
+  @apply p-3.5 border-t border-l;
 }
 
 body {
@@ -48,9 +56,11 @@ body {
 .btn-primary {
   @apply bg-blue-400;
 }
+
 .btn-icon {
   @apply flex items-center hover:bg-slate-200 disabled:bg-gray-400 ml-1 p-1.5  rounded-lg  shadow-2xl text-sm w-auto cursor-pointer;
 }
+
 .search {
   @apply rounded shadow-md text-sm h-8 w-full;
 }

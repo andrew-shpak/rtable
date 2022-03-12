@@ -6,7 +6,7 @@ export type RTableColumnProps = {
   key: NonNullable<string>;
   title?: React.ReactNode;
   visible?: boolean;
-  width?: string;
+  width?: string | number;
   flex?: number;
   className?: string;
   hint?: string;
@@ -14,10 +14,11 @@ export type RTableColumnProps = {
   sorted?: boolean;
 };
 
-export type RTableProps<> = {
+export type RTableProps = {
   rows: NonNullable<Array<RTableModel>>;
   columns: NonNullable<ReadonlyArray<RTableColumnProps>>;
   getRowId?: (row: RTableModel) => string | number;
+  height: string | number;
   classNames?: {
     table?: string;
     column?: string;
@@ -48,6 +49,10 @@ export type RTableProps<> = {
   selection?: {
     visible?: boolean;
     checkbox?: string;
+  };
+  extend?: {
+    className: string;
+    render: (params: { row: RTableModel; index: number }) => React.ReactNode;
   };
 };
 
