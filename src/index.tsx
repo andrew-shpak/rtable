@@ -1,5 +1,6 @@
 import * as React from 'react';
-import {Order, RTableProps} from './types';
+import {Order, RTableModel, RTableProps} from './types';
+import memoize from 'micro-memoize';
 
 export default function RTable(props: RTableProps) {
     const {
@@ -13,6 +14,7 @@ export default function RTable(props: RTableProps) {
             visible: true,
         },
         extend,
+        onSearchInputChanged
     } = props;
     const {
         rowsPerPage = [5, 10, 20, 50, 100],
@@ -20,32 +22,55 @@ export default function RTable(props: RTableProps) {
         of = 'of',
     } = pagination;
 
+    // Sync scroll
     const headerScroll = React.useRef<HTMLDivElement>(null);
     const bodyScroll = React.useRef<HTMLDivElement>(null);
 
+    // Global search
+    const [search, setSearch] = React.useState<string>('');
+    const [globalSearchValue, getGlobalSearchValue] = React.useState<string>('');
+    React.useEffect(() => {
+        const timeout = setTimeout(() => {
+            getGlobalSearchValue(search);
+        }, 600);
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [search]);
+    React.useEffect(()=>{
+        if (onSearchInputChanged) onSearchInputChanged(globalSearchValue)
+    },[globalSearchValue])
+    const showRowFn = memoize((row: RTableModel, searchValue: string) => Object.values(row).some((f) => f.toString().includes(searchValue)));
+    const filteredRows = React.useMemo(() => {
+        if(globalSearchValue.length === 0) return props.rows;
+        return props.rows.filter((row) => showRowFn(row, globalSearchValue))
+    }, [props.rows, globalSearchValue, showRowFn]);
+    // Pagination
     const [take, setTake] = React.useState<number>(defaultRowsPerPage);
     const [page, setPage] = React.useState<number>(0);
     const [visibleColumns, setVisibleColumns] = React.useState<string[]>(
         columns.map((f) => f.key)
     );
-    // selection
+    // Selection
     const [checked, setChecked] = React.useState<string[]>([]);
     const allIds = React.useMemo(
-        () => props.rows.map((row: any) => getRowId(row)),
-        [props.rows, getRowId]
+        () => filteredRows.map((row: any) => getRowId(row)),
+        [filteredRows, getRowId, globalSearchValue]
     );
     // Extended
     const [extended, setExtended] = React.useState<string[]>([]);
     // Sorting
     const [hoveredColumn, setHoveredColumn] = React.useState<string>('');
     const [orderBy, setOrderBy] = React.useState<{ column: string; direction: Order; type: 'text' | 'number' | 'date' }[]>([]);
+
     const rows = React.useMemo(() => {
-        let result = props.rows;
+        let result = filteredRows;
         orderBy.forEach((order) => {
             result = stableSort(result, getComparator(order.direction, order.column));
         });
         return result;
-    }, [props.rows, orderBy]);
+    }, [filteredRows, orderBy]);
+
     return (
         <div className={classNames?.table ?? ''}>
             <div
@@ -68,6 +93,7 @@ export default function RTable(props: RTableProps) {
                         placeholder={toolbar?.search?.placeholder ?? 'Enter text'}
                         className={toolbar?.search?.className ?? ''}
                         type={'search'}
+                        onChange={(event) => setSearch(event.target.value)}
                     />
                 </div>
             </div>
@@ -312,6 +338,8 @@ export default function RTable(props: RTableProps) {
                     const renderExtendedRow = extend?.render({
                         row,
                         rowIndex,
+                        showRowFn,
+                        searchValue:globalSearchValue,
                     });
                     const isExtended = extended.includes(key);
                     return (
@@ -335,7 +363,6 @@ export default function RTable(props: RTableProps) {
                                             else setExtended([...extended, key]);
                                         }}
                                     >
-
                                         {!isExtended && (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -344,7 +371,7 @@ export default function RTable(props: RTableProps) {
                                                 fill={'#18181b'}
                                                 viewBox="0 0 256 256"
                                                 style={{
-                                                    visibility: renderExtendedRow ? 'visible' : 'hidden'
+                                                    visibility: renderExtendedRow ? 'visible' : 'hidden',
                                                 }}
                                             >
                                                 <rect width="256" height="256" fill="none"/>
@@ -376,6 +403,9 @@ export default function RTable(props: RTableProps) {
                                                 height="16"
                                                 fill={'#18181b'}
                                                 viewBox="0 0 256 256"
+                                                style={{
+                                                    visibility: renderExtendedRow ? 'visible' : 'hidden',
+                                                }}
                                             >
                                                 <rect width="16" height="16" fill="none"/>
                                                 <line
@@ -444,7 +474,7 @@ export default function RTable(props: RTableProps) {
                                     );
                                 })}
                             </div>
-                            {isExtended && (
+                            {isExtended && renderExtendedRow && (
                                 <div
                                     style={{
                                         display: 'flex',

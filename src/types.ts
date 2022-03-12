@@ -19,6 +19,7 @@ export type RTableProps = {
   columns: NonNullable<ReadonlyArray<RTableColumnProps>>;
   getRowId?: (row: RTableModel) => string | number;
   height: string | number;
+  onSearchInputChanged?:(searchValue:string) => void
   classNames?: {
     table?: string;
     column?: string;
@@ -52,7 +53,11 @@ export type RTableProps = {
   };
   extend?: {
     className: string;
-    render: (params: { row: RTableModel; rowIndex: number }) => React.ReactNode;
+    render: (params: { row: RTableModel; rowIndex: number
+      showRowFn:(row:RTableModel, searchValue:string)=>boolean;
+      searchValue:string
+    }) => React.ReactNode;
+
   };
 };
 
