@@ -99,8 +99,8 @@ const App = () => {
             body: 'body',
             row: 'row',
           }}
-          onSearchInputChanged={(value)=>{
-            console.log(value,"1")
+          onSearchInputChanged={(value) => {
+            console.log(value, '1');
           }}
           selection={{
             checkbox: 'checkbox',
@@ -140,7 +140,7 @@ const App = () => {
           ]}
           extend={{
             className: 'extended',
-            render: ({ row,rowIndex }) => {
+            render: ({ row, rowIndex }) => {
               if (row.id === 1) return null;
               return '1';
             },

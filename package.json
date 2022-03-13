@@ -68,9 +68,9 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
-      "lint",
+      "git add",
       "pretty-quick — staged",
-      "git add"
+      "lint",
     ]
   }
 }
