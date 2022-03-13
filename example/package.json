@@ -9,12 +9,9 @@
     "build": "vite build"
   },
   "dependencies": {
-    "react-app-polyfill": "^3.0.0"
-  },
-  "alias": {
-    "react": "../node_modules/react",
-    "react-dom": "../node_modules/react-dom/profiling",
-    "scheduler/tracing": "../node_modules/scheduler/tracing-profiling"
+    "react": "^17.0.2",
+    "react-app-polyfill": "^3.0.0",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.0",
