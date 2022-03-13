@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Order, RTableModel, RTableProps } from './types';
+import { Order, RTableColumnProps, RTableModel, RTableProps } from './types';
 
 export default function RTable(props: RTableProps) {
   const {
@@ -14,6 +14,7 @@ export default function RTable(props: RTableProps) {
     },
     extend,
     onSearchInputChanged,
+    filters,
   } = props;
   const {
     rowsPerPage = [5, 10, 20, 50, 100],
@@ -58,6 +59,12 @@ export default function RTable(props: RTableProps) {
     () => filteredRows.map((row: any) => getRowId(row)),
     [filteredRows, getRowId]
   );
+  // Filters
+  const isActiveFilter = React.useCallback(
+    (column: RTableColumnProps, columnIndex: number) =>
+      filters.isActive({ column, columnIndex }),
+    []
+  );
   // Extended
   const [extended, setExtended] = React.useState<string[]>([]);
   // Sorting
@@ -73,7 +80,7 @@ export default function RTable(props: RTableProps) {
     });
     return result;
   }, [filteredRows, orderBy]);
-
+  const count = pagination?.count ?? rows.length;
   return (
     <div className={classNames?.table ?? ''}>
       <div
@@ -216,19 +223,21 @@ export default function RTable(props: RTableProps) {
           )}
           {columns.map((column, columnIndex) => {
             if (!visibleColumns.includes(column.key)) return null;
+            const { sorted = true, filtered = true } = column;
             const type = column.type ?? 'text';
-            const flex = `${column.flex ?? 0} 0 ${column.width ?? 'auto'}`;
+            const flex = `${column.flex ?? 0} 0 ${column.width ?? '100px'}`;
             const sortItem = orderBy.find((f) => f.column === column.key);
             const isHovered =
               hoveredColumn === column.key && !sortItem?.direction;
+            const isActiveColumnFilter = isActiveFilter(column, columnIndex);
             return (
               <div
                 style={{
                   flex,
                   display: 'flex',
-                  textAlign: type === 'number' ? 'right' : 'left',
                   cursor: 'pointer',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
                 onMouseEnter={() => setHoveredColumn(column.key)}
                 onMouseLeave={() => setHoveredColumn('')}
@@ -237,6 +246,7 @@ export default function RTable(props: RTableProps) {
                   classNames?.column ?? ''
                 }`}
                 onClick={() => {
+                  if (!sorted) return;
                   if (sortItem) {
                     const newArray = orderBy.filter(
                       (f) => f.column !== column.key
@@ -257,67 +267,106 @@ export default function RTable(props: RTableProps) {
                   }
                 }}
               >
-                {column.title}{' '}
-                {(sortItem?.direction === 'asc' || isHovered) && (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill={isHovered ? '#d1d5db' : '#18181b'}
-                    viewBox="0 0 256 256"
-                  >
-                    <rect width="16" height="16" fill="none" />
-                    <line
-                      x1="128"
-                      y1="216"
-                      x2="128"
-                      y2="40"
-                      fill="none"
-                      stroke={isHovered ? '#d1d5db' : '#18181b'}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="24"
-                    />
-                    <polyline
-                      points="56 112 128 40 200 112"
-                      fill="none"
-                      stroke={isHovered ? '#d1d5db' : '#18181b'}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="24"
-                    />
-                  </svg>
-                )}
-                {sortItem?.direction === 'desc' && (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill={isHovered ? '#d1d5db' : '#18181b'}
-                    viewBox="0 0 256 256"
-                  >
-                    <rect width="16" height="16" fill="none" />
-                    <line
-                      x1="128"
-                      y1="40"
-                      x2="128"
-                      y2="216"
-                      fill="none"
-                      stroke={isHovered ? '#d1d5db' : '#18181b'}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="24"
-                    />
-                    <polyline
-                      points="56 144 128 216 200 144"
-                      fill="none"
-                      stroke={isHovered ? '#d1d5db' : '#18181b'}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="24"
-                    />
-                  </svg>
-                )}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textAlign: type === 'number' ? 'right' : 'left',
+                  }}
+                >
+                  {column.title}{' '}
+                  {sorted && (sortItem?.direction === 'asc' || isHovered) && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill={isHovered ? '#d1d5db' : '#18181b'}
+                      viewBox="0 0 256 256"
+                    >
+                      <rect width="16" height="16" fill="none" />
+                      <line
+                        x1="128"
+                        y1="216"
+                        x2="128"
+                        y2="40"
+                        fill="none"
+                        stroke={isHovered ? '#d1d5db' : '#18181b'}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="24"
+                      />
+                      <polyline
+                        points="56 112 128 40 200 112"
+                        fill="none"
+                        stroke={isHovered ? '#d1d5db' : '#18181b'}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="24"
+                      />
+                    </svg>
+                  )}
+                  {sortItem?.direction === 'desc' && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill={isHovered ? '#d1d5db' : '#18181b'}
+                      viewBox="0 0 256 256"
+                    >
+                      <rect width="16" height="16" fill="none" />
+                      <line
+                        x1="128"
+                        y1="40"
+                        x2="128"
+                        y2="216"
+                        fill="none"
+                        stroke={isHovered ? '#d1d5db' : '#18181b'}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="24"
+                      />
+                      <polyline
+                        points="56 144 128 216 200 144"
+                        fill="none"
+                        stroke={isHovered ? '#d1d5db' : '#18181b'}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="24"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <div
+                  style={{
+                    width: 'min-content',
+                  }}
+                  onClick={() => {
+                    filters?.onClick({
+                      column,
+                      columnIndex,
+                    });
+                  }}
+                >
+                  {filtered && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill={isActiveColumnFilter ? '#dc2626' : '#18181b'}
+                      viewBox="0 0 256 256"
+                    >
+                      <rect width="16" height="16" fill="none" />
+                      <path
+                        d="M42.1,48H213.9a8,8,0,0,1,5.9,13.4l-65.7,72.3a7.8,7.8,0,0,0-2.1,5.4v56.6a7.9,7.9,0,0,1-3.6,6.7l-32,21.3a8,8,0,0,1-12.4-6.6v-78a7.8,7.8,0,0,0-2.1-5.4L36.2,61.4A8,8,0,0,1,42.1,48Z"
+                        fill="none"
+                        stroke={isActiveColumnFilter ? '#dc2626' : '#18181b'}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="24"
+                      />
+                    </svg>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -458,7 +507,7 @@ export default function RTable(props: RTableProps) {
                 {columns.map((column) => {
                   if (!visibleColumns.includes(column.key)) return null;
                   const flex = `${column.flex ?? 0} 0 ${
-                    column.width ?? 'auto'
+                    column.width ?? '100px'
                   }`;
                   const title = row[column.key];
                   return (
@@ -515,9 +564,8 @@ export default function RTable(props: RTableProps) {
           ))}
         </select>
         <span>
-          {take * page + 1} -{' '}
-          {rows.length < take ? rows.length : take * page + take} {of}{' '}
-          {rows.length}
+          {take * page + 1} - {count < take ? count : take * page + take} {of}{' '}
+          {count}
         </span>
         <div>
           {pagination?.previousPage ? (
@@ -545,7 +593,7 @@ export default function RTable(props: RTableProps) {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="24"
-                ></polyline>
+                />
               </svg>
             </button>
           )}
@@ -556,7 +604,7 @@ export default function RTable(props: RTableProps) {
           ) : (
             <button
               className={pagination?.nextPageClassName ?? ''}
-              disabled={take * page + take >= rows.length}
+              disabled={take * page + take >= count}
               onClick={() => setPage((state) => state + 1)}
             >
               <svg

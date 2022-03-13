@@ -66,7 +66,7 @@ const Actions = (props: { checked: string[] }) => {
                         },
 * */
 const App = () => {
-  const range = [...Array.from(Array(100).keys())];
+  const range = [...Array.from(Array(10000).keys())];
   const data = React.useMemo(
     () =>
       range.map((i) => {
@@ -126,11 +126,13 @@ const App = () => {
               key: 'name',
               title: 'aets',
               width: '1000px',
+              filtered: false,
             },
             {
               key: 'lastName',
               title: 'aets',
-              width: '1000px',
+              flex: 1,
+              sorted: false,
             },
             {
               key: 'middleName',
@@ -144,6 +146,10 @@ const App = () => {
               if (row.id === 1) return null;
               return '1';
             },
+          }}
+          filters={{
+            onClick: () => {},
+            isActive: () => true,
           }}
         />
       </div>

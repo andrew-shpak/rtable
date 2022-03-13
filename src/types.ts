@@ -12,6 +12,7 @@ export type RTableColumnProps = {
   hint?: string;
   type?: 'text' | 'number' | 'date';
   sorted?: boolean;
+  filtered?: boolean;
 };
 
 export type RTableProps = {
@@ -59,6 +60,16 @@ export type RTableProps = {
       showRowFn: (row: RTableModel, searchValue: string) => boolean;
       searchValue: string;
     }) => React.ReactNode;
+  };
+  filters: {
+    onClick: (params: {
+      column: RTableColumnProps;
+      columnIndex: number;
+    }) => void;
+    isActive: (params: {
+      column: RTableColumnProps;
+      columnIndex: number;
+    }) => boolean;
   };
 };
 
