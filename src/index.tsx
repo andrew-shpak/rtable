@@ -63,7 +63,7 @@ export default function RTable(props: RTableProps) {
   const isActiveFilter = React.useCallback(
     (column: RTableColumnProps, columnIndex: number) =>
       filters.isActive({ column, columnIndex }),
-    []
+    [filters]
   );
   // Extended
   const [extended, setExtended] = React.useState<string[]>([]);

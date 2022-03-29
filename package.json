@@ -72,5 +72,8 @@
       "pretty-quick — staged",
       "lint"
     ]
+  },
+  "dependencies": {
+    "eslint-plugin-prettier": "^4.0.0"
   }
 }
