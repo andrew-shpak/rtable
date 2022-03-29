@@ -99,9 +99,6 @@ const App = () => {
             body: 'body',
             row: 'row',
           }}
-          onSearchInputChanged={(value) => {
-            console.log(value, '1');
-          }}
           selection={{
             checkbox: 'checkbox',
           }}
