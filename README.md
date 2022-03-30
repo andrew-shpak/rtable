@@ -26,7 +26,7 @@ npm i rtable
 Then, import and use individual components:
 
 ```jsx
-import RTable from 'r-table';
+import RTable from '@andrii_shpak/rtable';
 
 <RTable rows={[]} columns={[]}/>
 ```
