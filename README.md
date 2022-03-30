@@ -7,7 +7,7 @@
 - Headless (100% customizable, Bring-your-own-UI)
 - Row Selection
 - Row Expansion
-- Animatable
+- Pagination
 
 ## Demo
 
