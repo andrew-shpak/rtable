@@ -8,3 +8,24 @@
 - Row Selection
 - Row Expansion
 - Animatable
+
+## Demo
+
+> [Visit site with example](https://rtable.vercel.app)
+
+## Quickstart
+
+```bash
+pnpm add rtable
+# or
+yarn add rtable
+# or
+npm i rtable
+```
+Then, import and use individual components:
+
+```jsx
+import RTable from 'r-table';
+
+<RTable rows={[]} columns={[]} />
+```
