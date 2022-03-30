@@ -39,5 +39,5 @@ import RTable from '@andrii_shpak/rtable';
 | rows          | NonNullable<Array<{ [name: string]: any }>> | Table data                                  |
 | columns       |                                             | Columns of the table                        |
 | columns.key   | string                                      | key  of the row. For example name or lastName   |
-| columns.type  | 'text'                                      | 'number' | 'date'                                               |            Types of column value                                     |
+| columns.type  | text / number / date                        |            Types of column value                                     |
 |               |                                             |                                                 |
