@@ -28,16 +28,16 @@ Then, import and use individual components:
 ```jsx
 import RTable from '@andrii_shpak/rtable';
 
-<RTable rows={[]} columns={[]}/>
+<RTable rows={[]} columns={[]} />;
 ```
 
 ### Properties
 
-| Property      | Type                                        | Description                                 |
-|---------------|---------------------------------------------|:--------------------------------------------|
-| height        | string/number                               | Height of body component. Needed for scroll |          
-| rows          | NonNullable<Array<{ [name: string]: any }>> | Table data                                  |
-| columns       |                                             | Columns of the table                        |
-| columns.key   | string                                      | key  of the row. For example name or lastName   |
-| columns.type  | text / number / date                        |            Types of column value                                     |
-|               |                                             |                                                 |
+| Property     | Type                                        | Description                                  |
+| ------------ | ------------------------------------------- | :------------------------------------------- |
+| height       | string/number                               | Height of body component. Needed for scroll  |
+| rows         | NonNullable<Array<{ [name: string]: any }>> | Table data                                   |
+| columns      |                                             | Columns of the table                         |
+| columns.key  | string                                      | key of the row. For example name or lastName |
+| columns.type | text / number / date                        | Types of column value                        |
+|              |                                             |                                              |

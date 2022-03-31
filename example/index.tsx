@@ -1,84 +1,59 @@
 import 'react-app-polyfill/ie11';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import RTable from '../src';
 import './main.css';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
+import Tooltip from '@reach/tooltip';
+import '@reach/tooltip/styles.css';
+import '@reach/dialog/styles.css';
 
-const Actions = (props: { checked: string[] }) => {
-  const { checked } = props;
-  return (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-      }}
-    >
-      <button className={'btn btn-success'} onClick={() => {}}>
-        Додати
-      </button>
-      <button className={'btn btn-danger'} disabled={checked.length === 0}>
-        Видалити
-      </button>
-      {/*{toolbar?.columns && (
-                <button
-                    className={toolbar.columns.className}
-                    onClick={() => {
-                        setVisibleColumns([]);
-                    }}
-                >
-                    Колонки
-                </button>
-            )}
-            {toolbar?.filters && (
-                <button
-                    style={{
-                        marginRight: '1rem',
-                    }}
-                    className={toolbar.filters.className}
-                >
-                    Фільтри
-                </button>
-            )}*/}
-    </div>
-  );
-};
-/*
-*  add: {
-                            className: "btn btn-success",
-                            title:"Додати",
-                            onClick: () => {
-
-                            }
-                        },
-                        remove: {
-                            title:"Видалити",
-                            className: "btn btn-danger",
-                            onClick: (ids) => {
-
-                            }
-                        },
-                        columns: {
-                            className: "btn btn-info",
-                        },
-                        filters: {
-                            className: "btn btn-primary",
-                        },
-* */
 const App = () => {
-  const range = [...Array.from(Array(10000).keys())];
-  const data = React.useMemo(
-    () =>
-      range.map((i) => {
-        return {
-          name: i,
-          lastName: i,
-          middleName: i,
-          id: i,
-        };
-      }),
-    []
-  );
+  const [data, setData] = React.useState([
+    { name: 'name1', id: 'name1' },
+    { name: 'name2', id: 'name2' },
+    { name: 'name3', id: 'name3' },
+  ]);
+  const Actions = (props: {
+    ids: string[];
+    indexes: number[];
+    clearCheckedRows: () => void;
+  }) => {
+    const { ids, indexes, clearCheckedRows } = props;
+    const nextIndex = data.length + 1;
+    return (
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+        }}
+      >
+        <button
+          className={'btn btn-success'}
+          onClick={() => {
+            data.push({
+              name: nextIndex + 'name',
+              // lastName: nextIndex,
+              // middleName: nextIndex,
+              id: nextIndex + 'name',
+            });
+          }}
+        >
+          Додати
+        </button>
+        <button
+          className={'btn btn-danger'}
+          disabled={ids.length === 0}
+          onClick={() => {
+            indexes.forEach((index) => data.splice(index, 1));
+            setData([...data]);
+            clearCheckedRows();
+          }}
+        >
+          Видалити
+        </button>
+      </div>
+    );
+  };
   return (
     <div
       style={{
@@ -114,7 +89,15 @@ const App = () => {
               placeholder: 'Введіть текст',
               className: 'search',
             },
-            actions: (params) => <Actions checked={params.ids} />,
+            actions: (params) => (
+              <Actions
+                ids={params.ids}
+                clearCheckedRows={params.clearCheckedRows}
+                indexes={params.ids.map((f) =>
+                  data.findIndex((x) => x.id.toString() === f)
+                )}
+              />
+            ),
           }}
           rows={data}
           height={'70vh'}
@@ -124,18 +107,25 @@ const App = () => {
               title: 'aets',
               width: '1000px',
               filtered: false,
+              render: (params) => {
+                return (
+                  <Tooltip label="Save">
+                    <span>{params.value}</span>
+                  </Tooltip>
+                );
+              },
             },
-            {
-              key: 'lastName',
-              title: 'aets',
-              flex: 1,
-              sorted: false,
-            },
-            {
-              key: 'middleName',
-              title: 'aets',
-              width: '1000px',
-            },
+            // {
+            //   key: 'lastName',
+            //   title: 'aets',
+            //   flex: 1,
+            //   sorted: false,
+            // },
+            // {
+            //   key: 'middleName',
+            //   title: 'aets',
+            //   width: '1000px',
+            // },
           ]}
           extend={{
             className: 'extended',
@@ -154,4 +144,6 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root')!;
+const root = createRoot(container);
+root.render(<App />);

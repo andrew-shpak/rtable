@@ -1,6 +1,14 @@
 import * as React from 'react';
 import { Order, RTableColumnProps, RTableModel, RTableProps } from './types';
-
+import {
+  ArrowDownIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  FilterIcon,
+} from './icons';
+import { getComparator, stableSort } from './utils';
 export default function RTable(props: RTableProps) {
   const {
     columns,
@@ -37,36 +45,44 @@ export default function RTable(props: RTableProps) {
       clearTimeout(timeout);
     };
   }, [search]);
+
   React.useEffect(() => {
     if (onSearchInputChanged) onSearchInputChanged(globalSearchValue);
   }, [globalSearchValue, onSearchInputChanged]);
+
   const showRowFn = React.useCallback(
     (row: RTableModel, searchValue: string) =>
       Object.values(row).some((f) => f.toString().includes(searchValue)),
     []
   );
+
   const filteredRows = React.useMemo(() => {
     if (globalSearchValue.length === 0) return props.rows;
     return props.rows.filter((row) => showRowFn(row, globalSearchValue));
   }, [props.rows, globalSearchValue, showRowFn]);
+
   // Pagination
   const [take, setTake] = React.useState<number>(defaultRowsPerPage);
   const [page, setPage] = React.useState<number>(0);
   const [visibleColumns] = React.useState<string[]>(columns.map((f) => f.key));
+
   // Selection
   const [checked, setChecked] = React.useState<string[]>([]);
   const allIds = React.useMemo(
     () => filteredRows.map((row: any) => getRowId(row)),
     [filteredRows, getRowId]
   );
+
   // Filters
   const isActiveFilter = React.useCallback(
     (column: RTableColumnProps, columnIndex: number) =>
       filters.isActive({ column, columnIndex }),
     [filters]
   );
+
   // Extended
   const [extended, setExtended] = React.useState<string[]>([]);
+
   // Sorting
   const [hoveredColumn, setHoveredColumn] = React.useState<string>('');
   const [orderBy, setOrderBy] = React.useState<
@@ -80,6 +96,7 @@ export default function RTable(props: RTableProps) {
     });
     return result;
   }, [filteredRows, orderBy]);
+
   const count = pagination?.count ?? rows.length;
   return (
     <div className={classNames?.table ?? ''}>
@@ -96,6 +113,7 @@ export default function RTable(props: RTableProps) {
           {toolbar?.actions &&
             toolbar?.actions({
               ids: checked,
+              clearCheckedRows: () => setChecked([]),
             })}
         </div>
         <div style={{ width: '20%' }}>
@@ -135,66 +153,8 @@ export default function RTable(props: RTableProps) {
                 else setExtended([]);
               }}
             >
-              {extended.length === 0 && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="16"
-                  fill={'#18181b'}
-                  viewBox="0 0 256 256"
-                >
-                  <rect width="256" height="256" fill="none" />
-                  <line
-                    x1="40"
-                    y1="128"
-                    x2="216"
-                    y2="128"
-                    fill="none"
-                    stroke={'#18181b'}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="24"
-                  />
-                  <polyline
-                    points="144 56 216 128 144 200"
-                    fill="none"
-                    stroke={'#18181b'}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="24"
-                  />
-                </svg>
-              )}
-              {extended.length > 0 && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill={'#18181b'}
-                  viewBox="0 0 256 256"
-                >
-                  <rect width="16" height="16" fill="none" />
-                  <line
-                    x1="128"
-                    y1="40"
-                    x2="128"
-                    y2="216"
-                    fill="none"
-                    stroke={'#18181b'}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="24"
-                  />
-                  <polyline
-                    points="56 144 128 216 200 144"
-                    fill="none"
-                    stroke={'#18181b'}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="24"
-                  />
-                </svg>
-              )}
+              {extended.length === 0 && <ArrowRightIcon />}
+              {extended.length > 0 && <ArrowDownIcon />}
             </div>
           )}
           {(selection?.visible || selection.checkbox) && (
@@ -274,66 +234,16 @@ export default function RTable(props: RTableProps) {
                     textAlign: type === 'number' ? 'right' : 'left',
                   }}
                 >
-                  {column.title}{' '}
+                  {column.render
+                    ? column.render({
+                        value: column.title ?? '',
+                      })
+                    : column.title}{' '}
                   {sorted && (sortItem?.direction === 'asc' || isHovered) && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill={isHovered ? '#d1d5db' : '#18181b'}
-                      viewBox="0 0 256 256"
-                    >
-                      <rect width="16" height="16" fill="none" />
-                      <line
-                        x1="128"
-                        y1="216"
-                        x2="128"
-                        y2="40"
-                        fill="none"
-                        stroke={isHovered ? '#d1d5db' : '#18181b'}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="24"
-                      />
-                      <polyline
-                        points="56 112 128 40 200 112"
-                        fill="none"
-                        stroke={isHovered ? '#d1d5db' : '#18181b'}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="24"
-                      />
-                    </svg>
+                    <ArrowUpIcon color={isHovered ? '#d1d5db' : '#18181b'} />
                   )}
                   {sortItem?.direction === 'desc' && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill={isHovered ? '#d1d5db' : '#18181b'}
-                      viewBox="0 0 256 256"
-                    >
-                      <rect width="16" height="16" fill="none" />
-                      <line
-                        x1="128"
-                        y1="40"
-                        x2="128"
-                        y2="216"
-                        fill="none"
-                        stroke={isHovered ? '#d1d5db' : '#18181b'}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="24"
-                      />
-                      <polyline
-                        points="56 144 128 216 200 144"
-                        fill="none"
-                        stroke={isHovered ? '#d1d5db' : '#18181b'}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="24"
-                      />
-                    </svg>
+                    <ArrowDownIcon color={isHovered ? '#d1d5db' : '#18181b'} />
                   )}
                 </div>
                 <div
@@ -348,23 +258,9 @@ export default function RTable(props: RTableProps) {
                   }}
                 >
                   {filtered && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill={isActiveColumnFilter ? '#dc2626' : '#18181b'}
-                      viewBox="0 0 256 256"
-                    >
-                      <rect width="16" height="16" fill="none" />
-                      <path
-                        d="M42.1,48H213.9a8,8,0,0,1,5.9,13.4l-65.7,72.3a7.8,7.8,0,0,0-2.1,5.4v56.6a7.9,7.9,0,0,1-3.6,6.7l-32,21.3a8,8,0,0,1-12.4-6.6v-78a7.8,7.8,0,0,0-2.1-5.4L36.2,61.4A8,8,0,0,1,42.1,48Z"
-                        fill="none"
-                        stroke={isActiveColumnFilter ? '#dc2626' : '#18181b'}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="24"
-                      />
-                    </svg>
+                    <FilterIcon
+                      color={isActiveColumnFilter ? '#dc2626' : '#18181b'}
+                    />
                   )}
                 </div>
               </div>
@@ -416,70 +312,10 @@ export default function RTable(props: RTableProps) {
                     }}
                   >
                     {!isExtended && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="15"
-                        height="16"
-                        fill={'#18181b'}
-                        viewBox="0 0 256 256"
-                        style={{
-                          visibility: renderExtendedRow ? 'visible' : 'hidden',
-                        }}
-                      >
-                        <rect width="256" height="256" fill="none" />
-                        <line
-                          x1="40"
-                          y1="128"
-                          x2="216"
-                          y2="128"
-                          fill="none"
-                          stroke={'#18181b'}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                        <polyline
-                          points="144 56 216 128 144 200"
-                          fill="none"
-                          stroke={'#18181b'}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                      </svg>
+                      <ArrowRightIcon visible={!!renderExtendedRow} />
                     )}
                     {isExtended && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill={'#18181b'}
-                        viewBox="0 0 256 256"
-                        style={{
-                          visibility: renderExtendedRow ? 'visible' : 'hidden',
-                        }}
-                      >
-                        <rect width="16" height="16" fill="none" />
-                        <line
-                          x1="128"
-                          y1="40"
-                          x2="128"
-                          y2="216"
-                          fill="none"
-                          stroke={'#18181b'}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                        <polyline
-                          points="56 144 128 216 200 144"
-                          fill="none"
-                          stroke={'#18181b'}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                      </svg>
+                      <ArrowDownIcon visible={!!renderExtendedRow} />
                     )}
                   </div>
                 )}
@@ -568,102 +404,30 @@ export default function RTable(props: RTableProps) {
           {count}
         </span>
         <div>
-          {pagination?.previousPage ? (
-            pagination?.previousPage
-          ) : (
-            <button
-              disabled={page === 0}
-              className={pagination?.previousPageClassName ?? ''}
-              onClick={() => {
-                if (page > 0) setPage((state) => state - 1);
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="#171717"
-                viewBox="0 0 256 256"
-              >
-                <rect width="256" height="256" fill="none"></rect>
-                <polyline
-                  points="160 208 80 128 160 48"
-                  fill="none"
-                  stroke="#171717"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="24"
-                />
-              </svg>
-            </button>
-          )}
+          <button
+            disabled={page === 0}
+            className={pagination?.previousPageClassName ?? ''}
+            onClick={() => {
+              if (page > 0) setPage((state) => state - 1);
+            }}
+          >
+            {pagination?.previousPage ? (
+              pagination?.previousPage
+            ) : (
+              <ChevronLeftIcon />
+            )}
+          </button>
         </div>
         <div>
-          {pagination.nextPage ? (
-            pagination.nextPage
-          ) : (
-            <button
-              className={pagination?.nextPageClassName ?? ''}
-              disabled={take * page + take >= count}
-              onClick={() => setPage((state) => state + 1)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="#171717"
-                viewBox="0 0 256 256"
-              >
-                <rect width="256" height="256" fill="none"></rect>
-                <polyline
-                  points="96 48 176 128 96 208"
-                  fill="none"
-                  stroke="#171717"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="24"
-                ></polyline>
-              </svg>
-            </button>
-          )}
+          <button
+            className={pagination?.nextPageClassName ?? ''}
+            disabled={take * page + take >= count}
+            onClick={() => setPage((state) => state + 1)}
+          >
+            {pagination.nextPage ? pagination.nextPage : <ChevronRightIcon />}
+          </button>
         </div>
       </div>
     </div>
   );
-}
-
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key
-): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// This method is created for cross-browser compatibility, if you don't
-// need to support IE11, you can use Array.prototype.sort() directly
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number
-) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
 }

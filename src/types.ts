@@ -4,7 +4,7 @@ export type RTableModel = { [name: string]: any };
 
 export type RTableColumnProps = {
   key: NonNullable<string>;
-  title?: React.ReactNode;
+  title?: string | number;
   visible?: boolean;
   width?: string | number;
   flex?: number;
@@ -13,6 +13,7 @@ export type RTableColumnProps = {
   type?: 'text' | 'number' | 'date';
   sorted?: boolean;
   filtered?: boolean;
+  render?: (params: { value: string | number }) => React.ReactNode;
 };
 
 export type RTableProps = {
@@ -42,7 +43,10 @@ export type RTableProps = {
   toolbar?: {
     className?: string;
     visible?: boolean;
-    actions?: (params: { ids: string[] }) => React.ReactNode;
+    actions?: (params: {
+      ids: string[];
+      clearCheckedRows: () => void;
+    }) => React.ReactNode;
     search?: {
       placeholder?: string;
       className?: string;
