@@ -46,6 +46,8 @@ export type RTableProps = {
     actions?: (params: {
       ids: string[];
       clearCheckedRows: () => void;
+      visibleColumns: string[]
+      setVisibleColumns: (columns:string[])=>void
     }) => React.ReactNode;
     search?: {
       placeholder?: string;

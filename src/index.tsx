@@ -64,7 +64,7 @@ export default function RTable(props: RTableProps) {
   // Pagination
   const [take, setTake] = React.useState<number>(defaultRowsPerPage);
   const [page, setPage] = React.useState<number>(0);
-  const [visibleColumns] = React.useState<string[]>(columns.map((f) => f.key));
+  const [visibleColumns,setVisibleColumns] = React.useState<string[]>(columns.map((f) => f.key));
 
   // Selection
   const [checked, setChecked] = React.useState<string[]>([]);
@@ -114,6 +114,8 @@ export default function RTable(props: RTableProps) {
             toolbar?.actions({
               ids: checked,
               clearCheckedRows: () => setChecked([]),
+                visibleColumns : visibleColumns,
+                setVisibleColumns
             })}
         </div>
         <div style={{ width: '20%' }}>
