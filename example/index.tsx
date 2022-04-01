@@ -1,12 +1,13 @@
 import 'react-app-polyfill/ie11';
 import * as React from 'react';
 import RTable from '../src';
-import './main.css';
 import Tooltip from '@reach/tooltip';
-import '@reach/tooltip/styles.css';
-import '@reach/dialog/styles.css';
 import Portal from '@reach/portal';
 import ReactDOM from 'react-dom';
+import {Dialog} from "@reach/dialog";
+import VisuallyHidden from '@reach/visually-hidden';
+import '@reach/tooltip/styles.css';
+import '@reach/dialog/styles.css';
 
 const App = () => {
     const [data, setData] = React.useState([
@@ -14,6 +15,10 @@ const App = () => {
         {name: 'name2', id: 'name2', lastName: "l2"},
         {name: 'name3', id: 'name3', lastName: "l3"},
     ]);
+const [gridFilters, setGridFilters] = React.useState({
+    name:'',
+    lastName:''
+});
     const columns = [
         {
             key: 'name',
@@ -34,19 +39,18 @@ const App = () => {
             flex: 1,
             sorted: false,
         },
-        // {
-        //   key: 'middleName',
-        //   title: 'aets',
-        //   width: '1000px',
-        // },
     ];
-    const Actions = (props: {
+    const Actions =(props: {
         ids: string[];
         indexes: number[];
         clearCheckedRows: () => void;
         visibleColumns: string[]
         setVisibleColumns: (columns: string[]) => void
     }) => {
+        const [showDialog, setShowDialog] = React.useState(false);
+        const [filters, setFilters] = React.useState(gridFilters);
+        const open = () => setShowDialog(true);
+        const close = () => setShowDialog(false);
         const {ids, indexes, clearCheckedRows, visibleColumns, setVisibleColumns} = props;
         const [openColumnsDialog, setOpenColumnsDialog] = React.useState<boolean>(false);
         const nextIndex = data.length + 1;
@@ -65,7 +69,6 @@ const App = () => {
                             data.push({
                                 name: nextIndex + 'name',
                                 lastName: nextIndex + "lastName",
-                                // middleName: nextIndex,
                                 id: nextIndex + 'name',
                             });
                         }}
@@ -92,7 +95,64 @@ const App = () => {
                     >
                         Columns
                     </button>
+                    <button
+                        className={`btn ${Object.values(gridFilters).some(x=> x.length>0)? "btn-warning":"btn-primary"}`}
+                        onClick={open}
+                    >
+                        Filters
+                    </button>
                 </div>
+                <Dialog isOpen={showDialog} onDismiss={close}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems:'center',
+                        justifyContent:'space-between',
+                        height:'20px'
+                    }}>
+                        <h2>Table filters</h2>
+                        <button className="close-button" onClick={close}>
+                            <VisuallyHidden>Close</VisuallyHidden>
+                            <span aria-hidden>×</span>
+                        </button>
+                    </div>
+                    <hr style={{
+                        marginBottom:'4px',
+                        marginTop:'4px',
+                    }}/>
+                    <div>
+                        <label>Name:</label>{}
+                        <input name={"name"} type="text" value={filters.name} onChange={(event)=> setFilters({
+                            ...filters,
+                            name:event.target.value
+                        })} className="input"
+                               placeholder={"Enter user name"}/>
+                    </div>
+                    <div>
+                        <label>LastName:</label>{}
+                        <input name={"lastName"} type="text" value={filters.lastName} onChange={(event)=> setFilters({
+                            ...filters,
+                            lastName:event.target.value
+                        })} className="input"
+                               placeholder={"Enter user last name"}/>
+                    </div>
+                    <hr style={{
+                        marginBottom:'4px',
+                        marginTop:'4px',
+                    }}/>
+                    <div style={{
+                        display:'flex',
+                        alignItems: 'center',
+                        justifyContent:'flex-end'
+                    }}>
+                        <button className="btn btn-danger" onClick={close}>Close</button>
+                        <button className="btn btn-success" onClick={()=>{
+                            setData(data.filter((row)=> row.name.includes(filters.name)))
+                            setGridFilters(filters);
+                            close()
+                        }}>Apply</button>
+                    </div>
+
+                </Dialog>
                 {openColumnsDialog && <Portal>
                     {columnsBtnRef.current && <div
                         style={{
@@ -100,10 +160,10 @@ const App = () => {
                             top: columnsBtnRef.current.offsetTop + columnsBtnRef.current.offsetHeight,
                             left: columnsBtnRef.current.offsetLeft,
                             width: 150,
-                            backgroundColor:"#e5e7eb",
-                            borderRadius:"4px",
-                            padding:'8px',
-                            marginTop:"2px",
+                            backgroundColor: "#e5e7eb",
+                            borderRadius: "4px",
+                            padding: '8px',
+                            marginTop: "2px",
                         }}
                     >
                         {columns.map(column => {

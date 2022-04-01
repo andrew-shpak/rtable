@@ -5,6 +5,7 @@ specifiers:
   '@reach/dialog': ^0.16.2
   '@reach/portal': ^0.16.2
   '@reach/tooltip': ^0.16.2
+  '@reach/visually-hidden': ^0.16.0
   '@tailwindcss/forms': ^0.5.0
   '@tsconfig/create-react-app': ^1.0.2
   '@types/react': ^17.0.43
@@ -24,6 +25,7 @@ dependencies:
   '@reach/dialog': 0.16.2_3ecc77c1a75e1c3491766c3a0f35f1aa
   '@reach/portal': 0.16.2_581fa33d3647c30d8078674dcd1b240a
   '@reach/tooltip': 0.16.2_581fa33d3647c30d8078674dcd1b240a
+  '@reach/visually-hidden': 0.16.0_581fa33d3647c30d8078674dcd1b240a
   react: 18.0.0-rc.3
   react-app-polyfill: 3.0.0
   react-dom: 18.0.0-rc.3_react@18.0.0-rc.3
